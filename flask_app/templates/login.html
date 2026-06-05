@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Connexion — Carnet d'Adresses</title>
+<style>
+  :root { --bg:#0d1117; --card:#161b22; --neon:#00ff9f; --neon2:#00cfff; --accent:#ff4e6a; --text:#c9d1d9; --muted:#8b949e; --border:#30363d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Consolas,monospace; background:var(--bg); color:var(--text); display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .login-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:40px 36px; width:100%; max-width:380px; }
+  h1 { color:var(--neon); font-size:1.1rem; text-align:center; margin-bottom:6px; }
+  .sub { color:var(--muted); font-size:.8rem; text-align:center; margin-bottom:28px; }
+  label { display:block; color:var(--neon2); font-size:.85rem; margin-bottom:5px; margin-top:14px; }
+  input { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:9px 12px; font-family:inherit; font-size:.9rem; outline:none; }
+  input:focus { border-color:var(--neon); }
+  .btn { width:100%; background:#1a7f4b; color:#fff; border:none; border-radius:4px; padding:10px; font-family:inherit; font-size:.9rem; font-weight:bold; cursor:pointer; margin-top:22px; }
+  .btn:hover { background:#238956; }
+  .flash-err { background:#2b0d13; color:var(--accent); border-left:3px solid var(--accent); padding:8px 12px; margin-top:14px; font-size:.85rem; border-radius:4px; }
+  .hint { color:var(--border); font-size:.75rem; text-align:center; margin-top:18px; }
+</style>
+</head>
+<body>
+<div class="login-box">
+  <h1>🔐 ACCÈS ADMINISTRATEUR</h1>
+  <p class="sub">Carnet d'Adresses International</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash-err">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST">
+    <label>Nom d'utilisateur</label>
+    <input type="text" name="username" autofocus required>
+    <label>Mot de passe</label>
+    <input type="password" name="password" required>
+    <button class="btn" type="submit">SE CONNECTER</button>
+  </form>
+  <p class="hint">admin / admin123</p>
+</div>
+</body>
+</html>

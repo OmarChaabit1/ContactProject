@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ "Modifier" if contact else "Ajouter" }} un contact{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:0 24px; }
+  .form-group { margin-bottom:14px; }
+  label { display:block; color:var(--neon2); font-size:.85rem; margin-bottom:5px; }
+  label.required { color:var(--neon); }
+  input, select { width:100%; background:var(--bg-input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:8px 12px; font-family:inherit; font-size:.9rem; outline:none; }
+  input:focus, select:focus { border-color:var(--neon); }
+  .form-actions { grid-column:1/-1; display:flex; gap:12px; margin-top:10px; }
+  .indicatif-display { color:var(--neon2); font-size:.9rem; padding:8px 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-title">
+      {{ "✎  MODIFIER LE CONTACT" if contact else "＋  AJOUTER UN CONTACT" }}
+    </div>
+
+    <form method="POST" class="form-grid">
+
+      <div class="form-group">
+        <label class="required">Nom *</label>
+        <input type="text" name="nom" value="{{ contact.nom if contact else '' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Prénom *</label>
+        <input type="text" name="prenom" value="{{ contact.prenom if contact else '' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Email *</label>
+        <input type="email" name="email" value="{{ contact.email if contact else '' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Numéro local * (10 chiffres)</label>
+        <input type="text" name="numero" value="{{ contact.numero_local if contact else '' }}"
+               pattern="\d{10}" required>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Pays *</label>
+        <select name="pays" id="pays" required onchange="updateIndicatif()">
+          <option value="">-- Sélectionner --</option>
+          {% for pays in indicatifs.keys()|sort %}
+            <option value="{{ pays }}"
+              {% if contact and contact.pays == pays %}selected{% endif %}>
+              {{ pays }}
+            </option>
+          {% endfor %}
+        </select>
+        <div class="indicatif-display" id="indicatif_display">
+          {% if contact %}{{ contact.indicatif }}{% else %}—{% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Catégorie</label>
+        <select name="categorie">
+          {% for cat in categories %}
+            <option value="{{ cat }}"
+              {% if contact and contact.categorie == cat %}selected{% endif %}>
+              {{ cat }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Adresse</label>
+        <input type="text" name="adresse" value="{{ contact.adresse if contact else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Fonction</label>
+        <input type="text" name="fonction" value="{{ contact.fonction if contact else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Entreprise</label>
+        <input type="text" name="entreprise" value="{{ contact.entreprise if contact else '' }}">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-add">
+          {{ "✔  ENREGISTRER" if contact else "＋  AJOUTER" }}
+        </button>
+        <a href="{{ url_for('index') }}" class="btn btn-muted">Annuler</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+const INDICATIFS = {{ indicatifs | tojson }};
+function updateIndicatif() {
+  const pays = document.getElementById("pays").value;
+  document.getElementById("indicatif_display").textContent =
+    pays && INDICATIFS[pays] ? INDICATIFS[pays] : "—";
+}
+</script>
+{% endblock %}

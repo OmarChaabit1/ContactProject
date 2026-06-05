@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Contacts{% endblock %}
+
+{% block extra_css %}
+<style>
+  .search-bar { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .search-bar input { flex:1; min-width:200px; background:var(--bg-input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:8px 12px; font-family:inherit; font-size:.9rem; outline:none; }
+  .search-bar input:focus { border-color:var(--neon2); }
+  .search-bar select { background:var(--bg-input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:8px 12px; font-family:inherit; font-size:.9rem; cursor:pointer; }
+  .search-bar button { padding:8px 18px; }
+  .actions { display:flex; gap:6px; }
+  .no-contacts { color:var(--muted); text-align:center; padding:40px; font-size:.9rem; }
+  .count { color:var(--muted); font-size:.8rem; margin-bottom:10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card">
+    <div class="card-title">▸ LISTE DES CONTACTS</div>
+
+    <!-- Recherche & filtre -->
+    <form method="GET" class="search-bar">
+      <input type="text" name="q" value="{{ q }}" placeholder="🔍 Rechercher nom, prénom, email…">
+      <select name="cat">
+        <option value="">Toutes les catégories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}" {% if cat == cat_filter %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-muted" type="submit">Filtrer</button>
+      <a href="{{ url_for('index') }}" class="btn btn-muted">Réinitialiser</a>
+      <a href="{{ url_for('ajouter') }}" class="btn btn-add">＋ Ajouter</a>
+    </form>
+
+    <p class="count">{{ contacts|length }} contact(s)</p>
+
+    {% if contacts %}
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th><th>Prénom</th><th>Email</th>
+          <th>Téléphone</th><th>Catégorie</th><th>Entreprise</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in contacts %}
+        <tr>
+          <td><strong>{{ c.nom }}</strong></td>
+          <td>{{ c.prenom }}</td>
+          <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+          <td>{{ c.telephone }}</td>
+          <td>
+            <span class="badge badge-{{ c.categorie|lower }}">{{ c.categorie }}</span>
+          </td>
+          <td>{{ c.entreprise or "—" }}</td>
+          <td class="actions">
+            <a href="{{ url_for('modifier', nom=c.nom) }}" class="btn btn-edit">✎</a>
+            <form method="POST" action="{{ url_for('supprimer', nom=c.nom) }}"
+                  onsubmit="return confirm('Supprimer {{ c.nom }} ?')">
+              <button type="submit" class="btn btn-del">✕</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="no-contacts">Aucun contact trouvé.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

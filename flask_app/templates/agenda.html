@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Agenda{% endblock %}
+
+{% block extra_css %}
+<style>
+  .agenda-layout { display:grid; grid-template-columns:1fr 2fr; gap:20px; }
+  .date-picker { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .date-picker input { background:var(--bg-input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:8px 12px; font-family:inherit; font-size:.9rem; }
+  .slot { display:flex; align-items:center; gap:12px; padding:8px 12px; margin-bottom:6px; border-radius:4px; border:1px solid var(--border); }
+  .slot.free  { background:#0d1f0d; }
+  .slot.taken { background:#1f0d0d; }
+  .slot-time  { font-weight:bold; width:56px; font-size:.9rem; }
+  .slot.free  .slot-time { color:var(--neon); }
+  .slot.taken .slot-time { color:var(--accent); }
+  .slot-info  { flex:1; font-size:.85rem; color:var(--muted); }
+  .form-row   { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px; }
+  label { display:block; color:var(--neon2); font-size:.85rem; margin-bottom:4px; }
+  input, select { width:100%; background:var(--bg-input); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:7px 10px; font-family:inherit; font-size:.85rem; outline:none; }
+  input:focus, select:focus { border-color:var(--neon); }
+  .reserve-form { background:#0d1a0d; border:1px solid var(--border); border-radius:6px; padding:16px; margin-top:16px; }
+  .reserve-form .card-title { color:var(--neon); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card-title" style="color:var(--neon);font-size:1.1rem;margin-bottom:16px;">
+    📅  AGENDA — GESTION DES RDV
+  </div>
+
+  <!-- Sélection date -->
+  <form method="GET" class="date-picker">
+    <label style="color:var(--muted);margin:0;">Date :</label>
+    <input type="date" name="date" value="{{ sel_date }}" onchange="this.form.submit()">
+  </form>
+
+  <div class="agenda-layout">
+
+    <!-- Colonne gauche : créneaux -->
+    <div class="card">
+      <div class="card-title">Créneaux — {{ sel_date }}</div>
+      {% for slot in creneaux %}
+        {% if slot in occupied %}
+          {% set rdv = rdv_list | selectattr("heure", "eq", slot) | first %}
+          <div class="slot taken">
+            <span class="slot-time">{{ slot }}</span>
+            <span class="slot-info">
+              {% if rdv %}{{ rdv.nom }} {{ rdv.prenom }}
+                {% if rdv.notes %} — {{ rdv.notes }}{% endif %}
+              {% endif %}
+            </span>
+            {% if rdv %}
+            <form method="POST" action="{{ url_for('supprimer_rdv', rdv_id=rdv.id) }}"
+                  onsubmit="return confirm('Annuler ce RDV ?')">
+              <input type="hidden" name="date" value="{{ sel_date }}">
+              <button type="submit" class="btn btn-del" style="padding:3px 8px;font-size:.75rem;">✕</button>
+            </form>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="slot free">
+            <span class="slot-time">{{ slot }}</span>
+            <span class="slot-info">Disponible</span>
+            <button class="btn btn-add" style="padding:3px 10px;font-size:.75rem;"
+                    onclick="selectSlot('{{ slot }}')">Réserver</button>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Colonne droite : formulaire réservation -->
+    <div>
+      <div class="card reserve-form">
+        <div class="card-title">＋ Réserver un créneau</div>
+        <form method="POST" action="{{ url_for('reserver_rdv') }}">
+          <input type="hidden" name="date" value="{{ sel_date }}">
+          <div class="form-row">
+            <div>
+              <label>Créneau</label>
+              <select name="heure" id="heure_select" required>
+                {% for slot in creneaux %}
+                  {% if slot not in occupied %}
+                    <option value="{{ slot }}">{{ slot }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label>Contact</label>
+              <select name="contact_id">
+                <option value="">— Aucun —</option>
+                {% for c in contacts %}
+                  <option value="{{ c._id }}">{{ c.nom }} {{ c.prenom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>Notes</label>
+            <input type="text" name="notes" placeholder="Motif, remarques…">
+          </div>
+          <button type="submit" class="btn btn-add" style="margin-top:12px;width:100%;">
+            ✔  CONFIRMER LE RDV
+          </button>
+        </form>
+      </div>
+
+      {% if rdv_list %}
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">RDV du {{ sel_date }}</div>
+        <table>
+          <tr><th>Heure</th><th>Contact</th><th>Notes</th></tr>
+          {% for rdv in rdv_list %}
+          <tr>
+            <td style="color:var(--neon);">{{ rdv.heure }}</td>
+            <td>{{ rdv.nom or "—" }} {{ rdv.prenom or "" }}</td>
+            <td style="color:var(--muted);">{{ rdv.notes or "—" }}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+function selectSlot(slot) {
+  document.getElementById("heure_select").value = slot;
+  document.getElementById("heure_select").scrollIntoView({behavior:"smooth"});
+}
+</script>
+{% endblock %}

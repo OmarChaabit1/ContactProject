@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Carnet d'Adresses{% endblock %}</title>
+<style>
+  :root {
+    --bg-dark:#0d1117; --bg-card:#161b22; --bg-input:#0d1117;
+    --neon:#00ff9f; --neon2:#00cfff; --accent:#ff4e6a;
+    --text:#c9d1d9; --muted:#8b949e; --border:#30363d;
+    --btn-add:#1a7f4b; --btn-del:#8b1a2e; --btn-edit:#1a4f7f;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family: "Consolas", monospace; background:var(--bg-dark); color:var(--text); min-height:100vh; }
+  a { color:var(--neon2); text-decoration:none; }
+  a:hover { color:var(--neon); }
+
+  /* Navbar */
+  nav { background:var(--bg-card); border-bottom:2px solid var(--neon); padding:10px 24px; display:flex; align-items:center; gap:20px; }
+  nav .brand { font-size:1.1rem; font-weight:bold; color:var(--neon); }
+  nav .nav-links { display:flex; gap:14px; margin-left:auto; }
+  nav .nav-links a { padding:5px 12px; border-radius:4px; font-size:.85rem; }
+  nav .nav-links a:hover { background:var(--bg-dark); }
+  nav .admin-badge { color:var(--neon2); font-size:.8rem; }
+
+  /* Flash messages */
+  .flash { padding:10px 18px; margin:12px 24px; border-radius:6px; font-size:.9rem; }
+  .flash.success { background:#0d2b1a; border-left:3px solid var(--neon); color:var(--neon); }
+  .flash.error   { background:#2b0d13; border-left:3px solid var(--accent); color:var(--accent); }
+  .flash.info    { background:#0d1f2b; border-left:3px solid var(--neon2); color:var(--neon2); }
+
+  /* Container */
+  .container { max-width:1100px; margin:0 auto; padding:20px 24px; }
+
+  /* Buttons */
+  .btn { display:inline-block; padding:7px 16px; border:none; border-radius:4px; cursor:pointer; font-family:inherit; font-size:.85rem; font-weight:bold; transition:.15s; }
+  .btn-add  { background:var(--btn-add); color:#fff; }
+  .btn-del  { background:var(--btn-del); color:#fff; }
+  .btn-edit { background:var(--btn-edit); color:#fff; }
+  .btn-muted{ background:#2d333b; color:var(--text); }
+  .btn:hover { opacity:.85; }
+
+  /* Cards */
+  .card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px; margin-bottom:16px; }
+  .card-title { color:var(--neon); font-size:1rem; font-weight:bold; margin-bottom:14px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+
+  /* Table */
+  table { width:100%; border-collapse:collapse; }
+  th { color:var(--neon2); font-size:.8rem; padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); }
+  td { padding:8px 10px; font-size:.85rem; border-bottom:1px solid #1c2128; vertical-align:middle; }
+  tr:hover td { background:#1c2128; }
+
+  /* Badge catégorie */
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.75rem; font-weight:bold; }
+  .badge-patient     { background:#0d2b1a; color:#00ff9f; }
+  .badge-fournisseur { background:#1a1a0d; color:#ffd700; }
+  .badge-laboratoire { background:#0d1a2b; color:#00cfff; }
+  .badge-client      { background:#2b0d1a; color:#ff69b4; }
+  .badge-entreprise  { background:#1a0d2b; color:#bf8aff; }
+  .badge-autre       { background:#1c2128; color:#8b949e; }
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <span class="brand">[ CARNET D'ADRESSES ]</span>
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}">🏠 Contacts</a>
+    <a href="{{ url_for('ajouter') }}">＋ Ajouter</a>
+    <a href="{{ url_for('agenda') }}">📅 Agenda</a>
+    <a href="{{ url_for('export') }}">⬇ CSV</a>
+    <a href="{{ url_for('logout') }}">🚪 Logout</a>
+  </div>
+  {% if admin %}<span class="admin-badge">👤 {{ admin }}</span>{% endif %}
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+</body>
+</html>
