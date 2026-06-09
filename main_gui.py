@@ -1,6 +1,6 @@
 """
 Point d'entrée principal — Carnet d'Adresses International
-Parties 4 à 9 intégrées.
+
 
 Lancement interface Tkinter :
     python main_gui.py

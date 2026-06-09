@@ -16,8 +16,12 @@ class EmailSender:
     dans les paramètres ou via les variables d'environnement.
     """
 
-    def __init__(self, smtp_server="smtp.gmail.com", smtp_port=587,
-                 smtp_user="", smtp_pass=""):
+    def __init__(self,
+                 smtp_server="smtp.gmail.com",
+                 smtp_port=587,
+                 smtp_user="dalaoui679@gmail.com",
+                 smtp_pass="utjs uwux ueih ryfb"):
+
         self.smtp_server = smtp_server
         self.smtp_port   = smtp_port
         self.smtp_user   = smtp_user

@@ -39,13 +39,15 @@ class Contact:
 
     def __init__(self, nom, prenom, email, pays, numero_local,
                  adresse="", fonction="", entreprise="", categorie="Autre"):
+        assert self._valider_nom(nom), "Le nom doit contenir uniquement des lettres."
+        assert self._valider_nom(prenom), "Le prénom doit contenir uniquement des lettres."
         assert nom.strip(), "Le nom ne peut pas être vide."
         assert prenom.strip(), "Le prénom ne peut pas être vide."
         assert self._valider_email(email), f"Email invalide : {email}"
         assert pays in INDICATIFS, f"Pays inconnu : '{pays}'"
         assert self._valider_numero(numero_local), \
             "Numéro invalide : doit contenir exactement 10 chiffres."
-
+        
         self.nom          = nom.strip()
         self.prenom       = prenom.strip()
         self.email        = email.strip()
@@ -60,6 +62,10 @@ class Contact:
 
     # ── Validation ──────────────────────────────────────────────────────────
 
+    def _valider_nom(self, valeur):
+        valeur = valeur.strip()
+        return bool(re.fullmatch(r"[A-Za-zÀ-ÿ\u0600-\u06FF\s'-]+", valeur))
+    
     def _valider_email(self, email):
         return bool(re.match(r'^[\w\.-]+@[\w\.-]+\.\w{2,}$', email.strip()))
 
